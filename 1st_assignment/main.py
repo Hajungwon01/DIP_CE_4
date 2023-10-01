@@ -72,7 +72,7 @@ while success:          # Loop until there are no more frames.
 
     new_frame = np.concatenate((original, frame_scaling), axis=1) # 화면 분할 기능 : 원본 영상과 scaling된 영상을 x축(가로 방향)상으로 이어붙이기
 
-    cv.imshow('Video Player : 4조'.encode('utf-8').decode(), new_frame)
+    cv.imshow('Video Player : Team 4', new_frame)
 
     count += 1
 
