@@ -36,6 +36,9 @@ Name = 'frozen.avi' # 파일 이름
 FullName = Path + Name
 SaveFileName = '4조.avi' # 저장할 파일 이름
 
+text = "Video Player : 4조"
+encoded_text = text.encode('utf-8')
+
 videoCapture = cv.VideoCapture(FullName) # 읽기용 객체 생성
 
 # 동영상 파일이 제대로 열렸는지 확인
@@ -49,7 +52,7 @@ fps = videoCapture.get(cv.CAP_PROP_FPS)
 dly_ms = 1000/(fps)
 
 # 창 만들기
-cv.namedWindow('Video Player : 4조')
+cv.namedWindow(encoded_text.decode('utf-8'))
 
 # resize 기능을 위한 width와 height 정의
 resize_height = int(videoCapture.get(cv.CAP_PROP_FRAME_HEIGHT)//2)
