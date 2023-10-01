@@ -36,9 +36,6 @@ Name = 'frozen.avi' # 파일 이름
 FullName = Path + Name
 SaveFileName = '4조.avi' # 저장할 파일 이름
 
-text = "Video Player : 4조"
-encoded_text = text.encode('utf-8')
-
 videoCapture = cv.VideoCapture(FullName) # 읽기용 객체 생성
 
 # 동영상 파일이 제대로 열렸는지 확인
@@ -52,7 +49,7 @@ fps = videoCapture.get(cv.CAP_PROP_FPS)
 dly_ms = 1000/(fps)
 
 # 창 만들기
-cv.namedWindow(encoded_text.decode('utf-8'))
+# cv.namedWindow("Video Player : Team 4")
 
 # resize 기능을 위한 width와 height 정의
 resize_height = int(videoCapture.get(cv.CAP_PROP_FRAME_HEIGHT)//2)
@@ -75,7 +72,7 @@ while success:          # Loop until there are no more frames.
 
     new_frame = np.concatenate((original, frame_scaling), axis=1) # 화면 분할 기능 : 원본 영상과 scaling된 영상을 x축(가로 방향)상으로 이어붙이기
 
-    cv.imshow('Video Player : 4조', new_frame)
+    cv.imshow('Video Player : 4조'.encode('utf-8').decode(), new_frame)
 
     count += 1
 
