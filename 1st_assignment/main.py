@@ -49,7 +49,7 @@ fps = videoCapture.get(cv.CAP_PROP_FPS)
 dly_ms = 1000/(fps)
 
 # 창 만들기
-# cv.namedWindow("Video Player : Team 4")
+cv.namedWindow("Video Player : Team 4")
 
 # resize 기능을 위한 width와 height 정의
 resize_height = int(videoCapture.get(cv.CAP_PROP_FRAME_HEIGHT)//2)
@@ -62,7 +62,22 @@ margin = 1      # 순수한 영상출력(재생) 외의 다른 작업에 소비�
 
 is_paused = False  # 동영상 일시 정지 상태 변수
 
-s_time = time.time()            # ms 단위의 현재 tick count을 반환
+s_time = time.time()   # ms 단위의 현재 tick count을 반환
+
+# 최대 프레임 인덱스
+max_frame_index = int(number_of_total_frames) - 1
+current_frame_index = 0
+
+# 트랙바 콜백 함수
+def slideCallBack(pos):
+    global current_frame_index, count
+    current_frame_index = pos
+    count = pos
+    videoCapture.set(cv.CAP_PROP_POS_FRAMES, current_frame_index)
+
+# 트랙바 생성 및 콜백 함수 연결
+cv.createTrackbar('SLIDE', 'Video Player : Team 4', 0, max_frame_index, slideCallBack)
+
 while success:          # Loop until there are no more frames.
     s = time.time()     # start. time in sec.
 
@@ -70,11 +85,19 @@ while success:          # Loop until there are no more frames.
     original = resize_frame.copy() # 원본 영상
     frame_scaling = resize_frame.copy() # scaling된 영상
 
-    new_frame = np.concatenate((original, frame_scaling), axis=1) # 화면 분할 기능 : 원본 영상과 scaling된 영상을 x축(가로 방향)상으로 이어붙이기
+    # 현재 프레임 인덱스를 원본 영상과 처리된 영상의 좌측 상단에 빨간색으로 표시
+    cv.putText(original, f'original: {count}', (10, 15), cv.FONT_HERSHEY_PLAIN, 1, (0, 0, 255), 1)
+    cv.putText(frame_scaling, f'scaling: {count}', (10, 15), cv.FONT_HERSHEY_PLAIN, 1, (0, 0, 255), 1)
+
+    # 화면 분할 기능 : 원본 영상과 scaling된 영상을 x축(가로 방향)상으로 이어붙이기
+    new_frame = np.concatenate((original, frame_scaling), axis=1)
 
     cv.imshow('Video Player : Team 4', new_frame)
 
+    # 재생중인 영상의 프레임 인덱스와 트랙바 위치를 업데이트
+    current_frame_index += 1
     count += 1
+    cv.setTrackbarPos('SLIDE', 'Video Player : Team 4', current_frame_index)
 
     key = cv.waitKey(1)
     if key == 27:  # esc 키를 누르면 비디오 종료
