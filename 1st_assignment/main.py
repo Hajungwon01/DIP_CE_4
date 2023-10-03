@@ -73,7 +73,7 @@ def slideCallBack(pos):
     global current_frame_index, count
     current_frame_index = pos
     count = pos
-    videoCapture.set(cv.CAP_PROP_POS_FRAMES, current_frame_index)
+    #videoCapture.set(cv.CAP_PROP_POS_FRAMES, current_frame_index)
 
 # 트랙바 생성 및 콜백 함수 연결
 cv.createTrackbar('SLIDE', 'Video Player : Team 4', 0, max_frame_index, slideCallBack)
@@ -95,11 +95,11 @@ while success:          # Loop until there are no more frames.
     cv.imshow('Video Player : Team 4', new_frame)
 
     # 재생중인 영상의 프레임 인덱스와 트랙바 위치를 업데이트
-    current_frame_index += 1
-    count += 1
     cv.setTrackbarPos('SLIDE', 'Video Player : Team 4', current_frame_index)
+    count += 1
+    current_frame_index += 1
 
-    key = cv.waitKey(1)
+    key = cv.waitKey(50)
     if key == 27:  # esc 키를 누르면 비디오 종료
         break
     elif key == ord(' '):  # 스페이스바를 누르면 동영상 일시 정지/재개
