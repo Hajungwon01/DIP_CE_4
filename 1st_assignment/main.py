@@ -46,7 +46,7 @@ def slideCallBack(pos):
     global current_frame_index, count
     current_frame_index = pos
     count = pos
-    #videoCapture.set(cv.CAP_PROP_POS_FRAMES, current_frame_index)
+    videoCapture.set(cv.CAP_PROP_POS_FRAMES, current_frame_index)
 
 # 트랙바 생성 및 콜백 함수 연결
 cv.createTrackbar('SLIDE', 'Video Player : Team 4', 0, max_frame_index, slideCallBack)
