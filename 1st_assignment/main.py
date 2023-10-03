@@ -92,7 +92,6 @@ while success:  # Loop until there are no more frames.
     brightness = cv.getTrackbarPos('Brightness', 'Video Player : Team 4')
 
     success, frame = videoCapture.read()  # 다음 프레임을 읽어온다.
-    print("\rCurrent frame number = ", count, end=' ')
     while ((time.time() - s) * 1000) < (dly_ms - margin):  # dly_ms: ms로 표시한 프레임간의 간격[ms]
         pass
 
