@@ -33,7 +33,11 @@ if not videoCapture.isOpened():
 # 동영상의 정보
 number_of_total_frames = videoCapture.get(cv.CAP_PROP_FRAME_COUNT)
 fps = videoCapture.get(cv.CAP_PROP_FPS)
-dly_ms = 1000 / (fps)
+dly_ms = 1000/(fps)
+
+# resize 기능을 위한 width와 height 정의
+resize_height = int(videoCapture.get(cv.CAP_PROP_FRAME_HEIGHT) // 2)
+resize_width = int(videoCapture.get(cv.CAP_PROP_FRAME_WIDTH) // 2)
 
 # 최대 프레임 인덱스
 max_frame_index = int(number_of_total_frames) - 1
@@ -43,14 +47,14 @@ is_paused = False
 
 # ======================================================
 
+# 저장을 위한 비디오 쓰기용 객체 생성
+fourcc = cv.VideoWriter_fourcc(*'XVID')  # 비디오 코덱 설정 (여기서는 XVID 사용)
+out = cv.VideoWriter(SaveFileName, fourcc, fps, (resize_width*2, resize_height))
+
+# =========================================================
+
 # 창 만들기
 cv.namedWindow("Video Player : Team 4")
-
-# ======================================================
-
-# resize 기능을 위한 width와 height 정의
-resize_height = int(videoCapture.get(cv.CAP_PROP_FRAME_HEIGHT) // 2)
-resize_width = int(videoCapture.get(cv.CAP_PROP_FRAME_WIDTH) // 2)
 
 # ======================================================
 
@@ -100,10 +104,15 @@ while success:  # Loop until there are no more frames.
     # ======================================================
 
     # 화면 분할 기능 : 원본 영상과 scaling된 영상을 x축(가로 방향)상으로 이어붙이기
-    new_frame = np.concatenate((original, frame_scaling), axis=1)
+    new_frame = np.hstack((original, frame_scaling))
 
     # 분할된 화면 출력하기
     cv.imshow('Video Player : Team 4', new_frame)
+
+    # ======================================================
+
+    # 영상 저장
+    out.write(new_frame)  # 현재 프레임 저장
 
     # ======================================================
 
@@ -140,4 +149,7 @@ print(f'Real play time={e_time:#.2f}[sec]')
 
 # ======================================================
 
+# 영상 저장 완료 후 릴리즈
 videoCapture.release()
+out.release()
+cv.destroyAllWindows()
