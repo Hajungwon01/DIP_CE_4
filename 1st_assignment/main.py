@@ -52,29 +52,7 @@ cv.namedWindow("Video Player : Team 4")
 resize_height = int(videoCapture.get(cv.CAP_PROP_FRAME_HEIGHT) // 2)
 resize_width = int(videoCapture.get(cv.CAP_PROP_FRAME_WIDTH) // 2)
 
-<<<<<<< HEAD
 # ======================================================
-=======
-success, frame = videoCapture.read()  # 동영상을 성공적으로 열었을 경우 프레임을 받아온다
-
-count = 0
-margin = 1  # 순수한 영상출력(재생) 외의 다른 작업에 소비되는 예상 추정시간[ms]. 경험치
-
-is_paused = False  # 동영상 일시 정지 상태 변수
-
-s_time = time.time()  # ms 단위의 현재 tick count을 반환
-
-# 최대 프레임 인덱스
-max_frame_index = int(number_of_total_frames) - 1
-current_frame_index = 0
-
-# 트랙바 콜백 함수
-def slideCallBack(pos):
-    global current_frame_index, count
-    current_frame_index = pos
-    count = pos
-    videoCapture.set(cv.CAP_PROP_POS_FRAMES, current_frame_index)
->>>>>>> 34a5b79f2f979fef74b841f24ca7b80e2902af21
 
 # 트랙바 생성 및 콜백 함수 연결
 cv.createTrackbar('Position', 'Video Player : Team 4', 0, max_frame_index, position_callback)
