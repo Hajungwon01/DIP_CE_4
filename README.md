@@ -28,5 +28,5 @@
         1) 아나콘다 가상환경
         2) 파이썬 가상환경
 
-### 🔨 Tool 🔨
+### 🔧 Tools 🔧
 <img src="https://img.shields.io/badge/Pycharm-000000?style=flat-square&logo=pycharm&logoColor=white"/>
