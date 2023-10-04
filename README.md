@@ -20,7 +20,7 @@
     4. 수행시간 출력 기능
         실행창에는 이론적 재생시간과 실제 재생시간이 표현되어야 한다.(그 차이가 적을 수록 유리)
         
-### <a href="https://github.com/Hajungwon01/DIP_CE_4/blob/main/1st_assignment/pyqt5.py">1st_assignment/pyqt5.py<img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=Python&logoColor=white"/></a>
+### <a href="https://github.com/Hajungwon01/DIP_CE_4/blob/main/1st_assignment/pyqt5.py">1st_assignment/pyqt5.py <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=Python&logoColor=white"/></a>
 
     1. 위 프로그램을 pyqt5으로 구성한 코드
 
