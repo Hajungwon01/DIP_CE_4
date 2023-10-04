@@ -2,7 +2,7 @@
 # 💻 디지털영상처리 4조 💻
 
 ## 1차 과제 - 동영상 플레이어 📹 
-### 1st_assignment/main.py <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=Python&logoColor=white"/>
+### 1st_assignment/main.py <a href="https://github.com/Hajungwon01/DIP_CE_4/blob/main/1st_assignment/main.py"><img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=Python&logoColor=white"/></a>
     1. 플레이 기능:
        한 화면 = 좌측(원본 영상) + 우측(밝기를 조절한 영상)
         - 화면이 너무 커지지 않도록 좌측과 우측 영상은 각각 1/2로 줄여서 사용하기 바랍니다.    playing - 기본. 항상 진행
@@ -20,7 +20,7 @@
     4. 수행시간 출력 기능
         실행창에는 이론적 재생시간과 실제 재생시간이 표현되어야 한다.(그 차이가 적을 수록 유리)
         
-### 1st_assignment/pyqt5.py
+### 1st_assignment/pyqt5.py <a href="https://github.com/Hajungwon01/DIP_CE_4/blob/main/1st_assignment/pyqt5.py"><img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=Python&logoColor=white"/></a>
 
     1. 위 프로그램을 pyqt5으로 구성한 코드
 
