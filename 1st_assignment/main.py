@@ -150,7 +150,7 @@ while success:  # Loop until there are no more frames.
     # ======================================================
 
     # 스페이스바 - 정지, esc키 - 종료
-    key = cv.waitKey(50)
+    key = cv.waitKey(1)
     if key == 27:  # esc 키를 누르면 비디오 종료
         break
     elif key == ord(' '):  # 스페이스바를 누르면 동영상 일시 정지/재개
