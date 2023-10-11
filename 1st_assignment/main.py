@@ -62,6 +62,13 @@ number_of_total_frames = videoCapture.get(cv.CAP_PROP_FRAME_COUNT)
 fps = videoCapture.get(cv.CAP_PROP_FPS)
 dly_ms = 1000/(fps)
 
+# 동영상의 너비와 높이
+width = int(videoCapture.get(cv.CAP_PROP_FRAME_WIDTH))
+height = int(videoCapture.get(cv.CAP_PROP_FRAME_HEIGHT))
+
+# 가로로 이어 붙인 화면의 크기가 FHD 해상도(1920x1080) 이내인지 확인
+resize_needed = (width*2 > 1920) or (height > 1080)
+
 # resize 기능을 위한 width와 height 정의
 resize_height = int(videoCapture.get(cv.CAP_PROP_FRAME_HEIGHT) // 2)
 resize_width = int(videoCapture.get(cv.CAP_PROP_FRAME_WIDTH) // 2)
@@ -107,9 +114,12 @@ while success:  # Loop until there are no more frames.
 
     # ======================================================
 
-    # 기존 원본 영상을 resize
-    resize_frame = cv.resize(frame.copy(), (resize_width, resize_height))
-    original = resize_frame.copy()  # 원본 영상
+    # resize 여부에 따른 작업 실행
+    if resize_needed:
+        resize_frame = cv.resize(frame.copy(), (resize_width, resize_height))
+        original = resize_frame.copy()  # 원본 영상
+    else:
+        original = frame.copy()
 
     # ======================================================
 
@@ -117,7 +127,7 @@ while success:  # Loop until there are no more frames.
     brightness = cv.getTrackbarPos('Brightness', 'Video Player : Team 4')
 
     # 프레임 밝기 조절
-    frame_scaling = cv.convertScaleAbs(resize_frame.copy(), alpha=brightness / 10.0)
+    frame_scaling = cv.convertScaleAbs(original.copy(), alpha=brightness / 10.0)
 
     # ======================================================
 
