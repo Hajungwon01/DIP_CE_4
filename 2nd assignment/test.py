@@ -40,6 +40,9 @@ def mouse_callback(event, x, y, flags, param):
         drawing = False
         roi_end = (x, y)
 
+    # 추가: 마우스 좌표 저장
+    mouse_x, mouse_y = x, y
+
 # ======================================================
 
 # 파일 지정
