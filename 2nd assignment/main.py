@@ -1,21 +1,43 @@
-"""
-제출자 성명: 하정원, 정성원, 박해윤
-제출자 학과 및 학번: 컴퓨터공학과 2020305082, 컴퓨터공학과 2020305068, 컴퓨터공학과 2018305028
-
-"""
-
-# 필요한 모듈 import
 import cv2 as cv
 import time
 import numpy as np
-
+import os
+import copy
 
 # position 트랙바 콜백 함수
 def position_callback(pos):
     videoCapture.set(cv.CAP_PROP_POS_FRAMES, pos)
 
+# def BF_sigmaColor(x):
+#     global sigmaColor
+#     sigmaColor = x
+#
+# def sigma_callback(x):
+#     global sigmaSpace
+#     sigmaSpace = x
+# 시그마 트랙바 콜백 함수
+def callback_S(x):
+    pass
+# scale 트랙바 콜백 함수
+def callback_S1(x):
+    pass
+def BF_sigmaColor(x):
+    pass
 
-# ======================================================
+def UM(img):
+    k = cv.getTrackbarPos('sigma', 'Video Player : Team 4') * 6 + 1
+    blur = cv.GaussianBlur(src=img, ksize=(k, k),sigmaX=cv.getTrackbarPos('sigma', 'Video Player : Team 4'))
+    UnsharpMaskImg = img - blur
+    SharpenedImg = img + cv.getTrackbarPos('scale', 'Video Player : Team 4') * UnsharpMaskImg
+    return SharpenedImg
+    
+def BF(img):
+    d = cv.getTrackbarPos('sigma', 'Video Player : Team 4') * 6 + 1
+    sigmaColor = cv.getTrackbarPos('sigmaColor',#트랙바 앞에 표시될 트랙바의 이름
+'Video Player : Team 4')
+    sigmaSpace = cv.getTrackbarPos('sigma', 'Video Player : Team 4')
+    dst = cv.bilateralFilter(img, d, sigmaColor, sigmaSpace)
+    return dst
 
 # 파일 지정
 Path = "../data/"  # 파일 경로
@@ -46,13 +68,6 @@ dly_ms = 1000/(fps)
 width = int(videoCapture.get(cv.CAP_PROP_FRAME_WIDTH))
 height = int(videoCapture.get(cv.CAP_PROP_FRAME_HEIGHT))
 
-# 가로로 이어 붙인 화면의 크기가 FHD 해상도(1920x1080) 이내인지 확인
-resize_needed = (width*2 > 1920) or (height > 1080)
-
-# resize 기능을 위한 width와 height 정의
-resize_height = int(videoCapture.get(cv.CAP_PROP_FRAME_HEIGHT) // 2)
-resize_width = int(videoCapture.get(cv.CAP_PROP_FRAME_WIDTH) // 2)
-
 # 최대 프레임 인덱스
 max_frame_index = int(number_of_total_frames) - 1
 
@@ -63,7 +78,7 @@ is_paused = False
 
 # 저장을 위한 비디오 쓰기용 객체 생성
 fourcc = cv.VideoWriter_fourcc(*'XVID')  # 비디오 코덱 설정 (여기서는 XVID 사용)
-out = cv.VideoWriter(SaveFileName, fourcc, fps, (resize_width*2, resize_height))
+out = cv.VideoWriter(SaveFileName, fourcc, fps, (width*2, height))
 
 # =========================================================
 
@@ -72,16 +87,29 @@ cv.namedWindow("Video Player : Team 4")
 
 # ======================================================
 
+# 파일 저장 경로 및 파일 이름 지정
+save_image_path = Path + 'captured_frames/'
+if not os.path.exists(save_image_path):
+    os.makedirs(save_image_path)
+
 # 트랙바 생성 및 콜백 함수 연결
 cv.createTrackbar('Position', 'Video Player : Team 4', 0, max_frame_index, position_callback)
 
-# 초기 밝기 설정
-brightness = 10
+cv.createTrackbar ('sigma',#트랙바 앞에 표시될 트랙바의 이름
+'Video Player : Team 4',#트랙바가 나타날 창의 이름
+1,#시작 당시의 슬라이더의 초기 위치
+8, callback_S)#슬라이더가 움직일 때 호출될 콜백 함수의 이름.
+                    #첫 번째 파라미터:트랙 바 위치.두 번째 파라미터:사용자 데이터.
+# 3) scale
+cv.createTrackbar ('scale',#트랙바 앞에 표시될 트랙바의 이름
+'Video Player : Team 4',#트랙바가 나타날 창의 이름
+1,#시작 당시의 슬라이더의 초기 위치
+6, callback_S1)
 
-# 트랙바 생성 및 콜백 함수 연결
-cv.createTrackbar('Brightness', 'Video Player : Team 4', brightness, 20, lambda x: None)
-
-# ======================================================
+cv.createTrackbar ('sigmaColor',#트랙바 앞에 표시될 트랙바의 이름
+'Video Player : Team 4',#트랙바가 나타날 창의 이름
+1,#시작 당시의 슬라이더의 초기 위치
+15, BF_sigmaColor)#슬라이더가 움직일 때 호출될 콜백 함수의 이름.
 
 success, frame = videoCapture.read()  # 동영상을 성공적으로 열었을 경우 프레임을 받아온다
 
@@ -94,52 +122,44 @@ while success:  # Loop until there are no more frames.
 
     # ======================================================
 
-    # resize 여부에 따른 작업 실행
-    if resize_needed:
-        resize_frame = cv.resize(frame.copy(), (resize_width, resize_height))
-        original = resize_frame.copy()  # 원본 영상
-    else:
-        original = frame.copy()
+    frame_scaling = frame.copy()
 
     # ======================================================
 
-    # 밝기 트랙바 값 가져오기
-    brightness = cv.getTrackbarPos('Brightness', 'Video Player : Team 4')
-
-    # 프레임 밝기 조절
-    frame_scaling = cv.convertScaleAbs(original.copy(), alpha=brightness / 10.0)
-
-    # ======================================================
-
-    # 현재 프레임 인덱스
+        # 현재 프레임 인덱스
     current_frame_index = int(videoCapture.get(cv.CAP_PROP_POS_FRAMES))
 
-    # 현재 프레임 인덱스를 원본 영상과 처리된 영상의 좌측 상단에 빨간색으로 표시
-    cv.putText(original, f'org_index={current_frame_index}', (10, 15), cv.FONT_HERSHEY_PLAIN, 1, (0, 0, 255), 2)
-    cv.putText(frame_scaling, f'this_index={current_frame_index}', (10, 15), cv.FONT_HERSHEY_PLAIN, 1, (0, 0, 255), 2)
+    # frame_scaling = UM(frame_scaling / 255)
+    frame_scaling = BF(frame_scaling)
+        # 현재 프레임 인덱스를 원본 영상과 처리된 영상의 좌측 상단에 빨간색으로 표시
+    cv.putText(frame, f'org_index={current_frame_index}', (10, 15), cv.FONT_HERSHEY_PLAIN, 1, (0, 0, 255), 2)
+    cv.putText(frame_scaling, f'this_index={current_frame_index}', (10, 15), cv.FONT_HERSHEY_PLAIN, 1, (0, 0, 255),
+                   2)
 
-    # ======================================================
+        # ======================================================
 
-    # 화면 분할 기능 : 원본 영상과 scaling된 영상을 x축(가로 방향)상으로 이어붙이기
-    new_frame = np.hstack((original, frame_scaling))
+        # 화면 분할 기능 : 원본 영상과 scaling된 영상을 x축(가로 방향)상으로 이어붙이기
+    # frame_scaling = np.clip(frame_scaling * 255, 0, 255).astype('uint8')
+    new_frame = np.hstack((frame, frame_scaling))
 
-    # 분할된 화면 출력하기
+        # 분할된 화면 출력하기
     cv.imshow('Video Player : Team 4', new_frame)
 
-    # ======================================================
+        # ======================================================
 
-    # 영상 저장
+        # 영상 저장
     out.write(new_frame)  # 현재 프레임 저장
 
-    # ======================================================
+        # ======================================================
 
-    # 재생중인 영상의 프레임 인덱스와 트랙바 위치를 업데이트
+        # 재생중인 영상의 프레임 인덱스와 트랙바 위치를 업데이트
     cv.setTrackbarPos('Position', 'Video Player : Team 4', current_frame_index)
     current_frame_index += 1
 
-    # ======================================================
+        # ======================================================
+    success, frame = videoCapture.read()  # 다음 프레임을 읽어온다.
 
-    # 스페이스바 - 정지, esc키 - 종료
+        # 스페이스바 - 정지, esc키 - 종료
     key = cv.waitKey(1)
     if key == 27:  # esc 키를 누르면 비디오 종료
         break
@@ -150,23 +170,16 @@ while success:  # Loop until there are no more frames.
             if key2 == ord(' '):  # 스페이스바를 다시 누르면 동영상 일시 정지 해제
                 is_paused = False
 
-    # ======================================================
+        # ======================================================
+        # 's' 키를 누르면 현재 화면을 이미지로 저장
+    if key == ord('s'):
+        save_image_name = f'frame_{current_frame_index}.jpg'
+        save_image_full_path = os.path.join(save_image_path, save_image_name)
+        cv.imwrite(save_image_full_path, new_frame)
+        print(f"현재 화면이 {save_image_name}으로 저장되었습니다.")
 
-    success, frame = videoCapture.read()  # 다음 프레임을 읽어온다.
+        # ======================================================
     while ((time.time() - s) * 1000) < (dly_ms - margin):  # dly_ms: ms로 표시한 프레임간의 간격[ms]
         pass
 
-# ======================================================
-
-# 수행시간 출력
-e_time = time.time() - s_time
-playing_sec = number_of_total_frames / fps  # 상영시간[sec]
-print(f'\n\nExpected play time={playing_sec:#.2f}[sec]')
-print(f'Real play time={e_time:#.2f}[sec]')
-
-# ======================================================
-
-# 영상 저장 완료 후 릴리즈
-videoCapture.release()
-out.release()
-cv.destroyAllWindows()
+        # ======================================================
