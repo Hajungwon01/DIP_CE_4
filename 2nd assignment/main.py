@@ -4,9 +4,22 @@ import numpy as np
 import os
 import copy
 
+
 # position 트랙바 콜백 함수
 def position_callback(pos):
     videoCapture.set(cv.CAP_PROP_POS_FRAMES, pos)
+
+def callback_AlgSelect(x):
+    if x == 0:      # default
+        pass
+    elif x == 1:    # HE
+        pass
+    elif x == 2:    # BF
+        pass
+    elif x == 3:    # UM
+        pass
+
+
 
 # def BF_sigmaColor(x):
 #     global sigmaColor
@@ -18,26 +31,36 @@ def position_callback(pos):
 # 시그마 트랙바 콜백 함수
 def callback_S(x):
     pass
+
+
 # scale 트랙바 콜백 함수
 def callback_S1(x):
     pass
+
+
 def BF_sigmaColor(x):
     pass
 
+
 def UM(img):
     k = cv.getTrackbarPos('sigma', 'Video Player : Team 4') * 6 + 1
-    blur = cv.GaussianBlur(src=img, ksize=(k, k),sigmaX=cv.getTrackbarPos('sigma', 'Video Player : Team 4'))
+    blur = cv.GaussianBlur(src=img, ksize=(k, k), sigmaX=cv.getTrackbarPos('sigma', 'Video Player : Team 4'))
     UnsharpMaskImg = img - blur
     SharpenedImg = img + cv.getTrackbarPos('scale', 'Video Player : Team 4') * UnsharpMaskImg
     return SharpenedImg
-    
+
+
 def BF(img):
     d = cv.getTrackbarPos('sigma', 'Video Player : Team 4') * 6 + 1
-    sigmaColor = cv.getTrackbarPos('sigmaColor',#트랙바 앞에 표시될 트랙바의 이름
-'Video Player : Team 4')
+    sigmaColor = cv.getTrackbarPos('sigmaColor',  # 트랙바 앞에 표시될 트랙바의 이름
+                                   'Video Player : Team 4')
     sigmaSpace = cv.getTrackbarPos('sigma', 'Video Player : Team 4')
     dst = cv.bilateralFilter(img, d, sigmaColor, sigmaSpace)
     return dst
+
+def HE(img):
+    pass
+
 
 # 파일 지정
 Path = "../data/"  # 파일 경로
@@ -62,7 +85,7 @@ if not videoCapture.isOpened():
 # 동영상의 정보
 number_of_total_frames = videoCapture.get(cv.CAP_PROP_FRAME_COUNT)
 fps = videoCapture.get(cv.CAP_PROP_FPS)
-dly_ms = 1000/(fps)
+dly_ms = 1000 / (fps)
 
 # 동영상의 너비와 높이
 width = int(videoCapture.get(cv.CAP_PROP_FRAME_WIDTH))
@@ -78,7 +101,7 @@ is_paused = False
 
 # 저장을 위한 비디오 쓰기용 객체 생성
 fourcc = cv.VideoWriter_fourcc(*'XVID')  # 비디오 코덱 설정 (여기서는 XVID 사용)
-out = cv.VideoWriter(SaveFileName, fourcc, fps, (width*2, height))
+out = cv.VideoWriter(SaveFileName, fourcc, fps, (width * 2, height))
 
 # =========================================================
 
@@ -95,21 +118,23 @@ if not os.path.exists(save_image_path):
 # 트랙바 생성 및 콜백 함수 연결
 cv.createTrackbar('Position', 'Video Player : Team 4', 0, max_frame_index, position_callback)
 
-cv.createTrackbar ('sigma',#트랙바 앞에 표시될 트랙바의 이름
-'Video Player : Team 4',#트랙바가 나타날 창의 이름
-1,#시작 당시의 슬라이더의 초기 위치
-8, callback_S)#슬라이더가 움직일 때 호출될 콜백 함수의 이름.
-                    #첫 번째 파라미터:트랙 바 위치.두 번째 파라미터:사용자 데이터.
-# 3) scale
-cv.createTrackbar ('scale',#트랙바 앞에 표시될 트랙바의 이름
-'Video Player : Team 4',#트랙바가 나타날 창의 이름
-1,#시작 당시의 슬라이더의 초기 위치
-6, callback_S1)
+cv.createTrackbar('Algorithm', 'Video Player : Team 4', 0, 3, callback_AlgSelect)
 
-cv.createTrackbar ('sigmaColor',#트랙바 앞에 표시될 트랙바의 이름
-'Video Player : Team 4',#트랙바가 나타날 창의 이름
-1,#시작 당시의 슬라이더의 초기 위치
-15, BF_sigmaColor)#슬라이더가 움직일 때 호출될 콜백 함수의 이름.
+cv.createTrackbar('sigma',  # 트랙바 앞에 표시될 트랙바의 이름
+                  'Video Player : Team 4',  # 트랙바가 나타날 창의 이름
+                  1,  # 시작 당시의 슬라이더의 초기 위치
+                  8, callback_S)  # 슬라이더가 움직일 때 호출될 콜백 함수의 이름.
+# 첫 번째 파라미터:트랙 바 위치.두 번째 파라미터:사용자 데이터.
+# 3) scale
+cv.createTrackbar('scale',  # 트랙바 앞에 표시될 트랙바의 이름
+                  'Video Player : Team 4',  # 트랙바가 나타날 창의 이름
+                  1,  # 시작 당시의 슬라이더의 초기 위치
+                  6, callback_S1)
+
+cv.createTrackbar('sigmaColor',  # 트랙바 앞에 표시될 트랙바의 이름
+                  'Video Player : Team 4',  # 트랙바가 나타날 창의 이름
+                  1,  # 시작 당시의 슬라이더의 초기 위치
+                  15, BF_sigmaColor)  # 슬라이더가 움직일 때 호출될 콜백 함수의 이름.
 
 success, frame = videoCapture.read()  # 동영상을 성공적으로 열었을 경우 프레임을 받아온다
 
@@ -126,40 +151,40 @@ while success:  # Loop until there are no more frames.
 
     # ======================================================
 
-        # 현재 프레임 인덱스
+    # 현재 프레임 인덱스
     current_frame_index = int(videoCapture.get(cv.CAP_PROP_POS_FRAMES))
 
     # frame_scaling = UM(frame_scaling / 255)
     frame_scaling = BF(frame_scaling)
-        # 현재 프레임 인덱스를 원본 영상과 처리된 영상의 좌측 상단에 빨간색으로 표시
+    # 현재 프레임 인덱스를 원본 영상과 처리된 영상의 좌측 상단에 빨간색으로 표시
     cv.putText(frame, f'org_index={current_frame_index}', (10, 15), cv.FONT_HERSHEY_PLAIN, 1, (0, 0, 255), 2)
     cv.putText(frame_scaling, f'this_index={current_frame_index}', (10, 15), cv.FONT_HERSHEY_PLAIN, 1, (0, 0, 255),
-                   2)
+               2)
 
-        # ======================================================
+    # ======================================================
 
-        # 화면 분할 기능 : 원본 영상과 scaling된 영상을 x축(가로 방향)상으로 이어붙이기
+    # 화면 분할 기능 : 원본 영상과 scaling된 영상을 x축(가로 방향)상으로 이어붙이기
     # frame_scaling = np.clip(frame_scaling * 255, 0, 255).astype('uint8')
     new_frame = np.hstack((frame, frame_scaling))
 
-        # 분할된 화면 출력하기
+    # 분할된 화면 출력하기
     cv.imshow('Video Player : Team 4', new_frame)
 
-        # ======================================================
+    # ======================================================
 
-        # 영상 저장
+    # 영상 저장
     out.write(new_frame)  # 현재 프레임 저장
 
-        # ======================================================
+    # ======================================================
 
-        # 재생중인 영상의 프레임 인덱스와 트랙바 위치를 업데이트
+    # 재생중인 영상의 프레임 인덱스와 트랙바 위치를 업데이트
     cv.setTrackbarPos('Position', 'Video Player : Team 4', current_frame_index)
     current_frame_index += 1
 
-        # ======================================================
+    # ======================================================
     success, frame = videoCapture.read()  # 다음 프레임을 읽어온다.
 
-        # 스페이스바 - 정지, esc키 - 종료
+    # 스페이스바 - 정지, esc키 - 종료
     key = cv.waitKey(1)
     if key == 27:  # esc 키를 누르면 비디오 종료
         break
