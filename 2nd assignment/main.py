@@ -4,16 +4,18 @@ import numpy as np
 import os
 import copy
 
+frame_scaling = None
 
 # position 트랙바 콜백 함수
 def position_callback(pos):
     videoCapture.set(cv.CAP_PROP_POS_FRAMES, pos)
 
 def callback_AlgSelect(x):
+    global frame_scaling
     if x == 0:      # default
         pass
     elif x == 1:    # HE
-        pass
+        frame_scaling = HE(frame_scaling)
     elif x == 2:    # BF
         pass
     elif x == 3:    # UM
@@ -59,8 +61,16 @@ def BF(img):
     return dst
 
 def HE(img):
-    pass
+    # 그래이스케일 이미지로 변환
+    gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
+    # HistogramEqualization
+    equalized_img = cv.equalizeHist(gray_img)
+
+    # BGR로 재 전환
+    equalized_img_bgr = cv.cvtColor(equalized_img, cv.COLOR_GRAY2BGR)
+
+    return equalized_img_bgr
 
 # 파일 지정
 Path = "../data/"  # 파일 경로
