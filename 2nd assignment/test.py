@@ -2,61 +2,29 @@ import cv2 as cv
 import time
 import numpy as np
 import os
-import copy
 
 # AOI 선택을 위한 전역 변수
+roi = None
 drawing = False
 roi_start = (0, 0)
 roi_end = (0, 0)
 original_copy = None
 
-# 마우스 이벤트 콜백 함수
-def mouse_callback(event, x, y, flags, param):
-    global drawing, roi_start, roi_end, original_copy
-
-    if event == cv.EVENT_LBUTTONDOWN:
-        drawing = True
-        roi_start = (x, y)
-        original_copy = frame.copy()
-
-    elif event == cv.EVENT_LBUTTONUP:
-        drawing = False
-        roi_end = (x, y)
-
-    # 추가: 마우스 좌표 저장
-    mouse_x, mouse_y = x, y
-
-    # 추가: AOI를 사각형으로 표시
-    if drawing:
-        frame_copy = original_copy.copy()
-        cv.rectangle(frame_copy, roi_start, (mouse_x, mouse_y), (0, 255, 0), 2)
-        cv.imshow('Video Player : Team 4', frame_copy)
-
 # position 트랙바 콜백 함수
 def position_callback(pos):
     videoCapture.set(cv.CAP_PROP_POS_FRAMES, pos)
 
-
-# def BF_sigmaColor(x):
-#     global sigmaColor
-#     sigmaColor = x
-#
-# def sigma_callback(x):
-#     global sigmaSpace
-#     sigmaSpace = x
 # 시그마 트랙바 콜백 함수
 def callback_S(x):
     pass
 
-
-# scale 트랙바 콜백 함수
+# 스케일 트랙바 콜백 함수
 def callback_S1(x):
     pass
 
-
+# 시그마 컬러 트랙바 콜백 함수
 def BF_sigmaColor(x):
     pass
-
 
 def UM(img):
     k = cv.getTrackbarPos('sigma', 'Video Player : Team 4') * 6 + 1
@@ -65,15 +33,12 @@ def UM(img):
     SharpenedImg = img + cv.getTrackbarPos('scale', 'Video Player : Team 4') * UnsharpMaskImg
     return SharpenedImg
 
-
 def BF(img):
     d = cv.getTrackbarPos('sigma', 'Video Player : Team 4') * 6 + 1
-    sigmaColor = cv.getTrackbarPos('sigmaColor',  # 트랙바 앞에 표시될 트랙바의 이름
-                                   'Video Player : Team 4')
+    sigmaColor = cv.getTrackbarPos('sigmaColor', 'Video Player : Team 4')
     sigmaSpace = cv.getTrackbarPos('sigma', 'Video Player : Team 4')
     dst = cv.bilateralFilter(img, d, sigmaColor, sigmaSpace)
     return dst
-
 
 # 파일 지정
 Path = "../data/"  # 파일 경로
@@ -130,25 +95,9 @@ if not os.path.exists(save_image_path):
 
 # 트랙바 생성 및 콜백 함수 연결
 cv.createTrackbar('Position', 'Video Player : Team 4', 0, max_frame_index, position_callback)
-
-cv.createTrackbar('sigma',  # 트랙바 앞에 표시될 트랙바의 이름
-                  'Video Player : Team 4',  # 트랙바가 나타날 창의 이름
-                  1,  # 시작 당시의 슬라이더의 초기 위치
-                  8, callback_S)  # 슬라이더가 움직일 때 호출될 콜백 함수의 이름.
-# 첫 번째 파라미터:트랙 바 위치.두 번째 파라미터:사용자 데이터.
-# 3) scale
-cv.createTrackbar('scale',  # 트랙바 앞에 표시될 트랙바의 이름
-                  'Video Player : Team 4',  # 트랙바가 나타날 창의 이름
-                  1,  # 시작 당시의 슬라이더의 초기 위치
-                  6, callback_S1)
-
-cv.createTrackbar('sigmaColor',  # 트랙바 앞에 표시될 트랙바의 이름
-                  'Video Player : Team 4',  # 트랙바가 나타날 창의 이름
-                  1,  # 시작 당시의 슬라이더의 초기 위치
-                  15, BF_sigmaColor)  # 슬라이더가 움직일 때 호출될 콜백 함수의 이름.
-
-# 창에 마우스 이벤트 콜백 함수 연결
-cv.setMouseCallback('Video Player : Team 4', mouse_callback)
+cv.createTrackbar('sigma', 'Video Player : Team 4', 1, 8, callback_S)
+cv.createTrackbar('scale', 'Video Player : Team 4', 1, 6, callback_S1)
+cv.createTrackbar('sigmaColor', 'Video Player : Team 4', 1, 15, BF_sigmaColor)
 
 success, frame = videoCapture.read()  # 동영상을 성공적으로 열었을 경우 프레임을 받아온다
 
@@ -191,6 +140,13 @@ while success:  # Loop until there are no more frames.
 
     # ======================================================
 
+    # AOI 선택
+    if roi is not None:
+        roi_frame = frame_scaling[int(roi[1]):int(roi[1] + roi[3]), int(roi[0]):int(roi[0] + roi[2])]
+        cv.imshow('ROI', roi_frame)
+
+    # ======================================================
+
     # 재생중인 영상의 프레임 인덱스와 트랙바 위치를 업데이트
     cv.setTrackbarPos('Position', 'Video Player : Team 4', current_frame_index)
     current_frame_index += 1
@@ -211,14 +167,31 @@ while success:  # Loop until there are no more frames.
 
         # ======================================================
         # 's' 키를 누르면 현재 화면을 이미지로 저장
-    if key == ord('s'):
+    elif key == ord('s'):
         save_image_name = f'frame_{current_frame_index}.jpg'
         save_image_full_path = os.path.join(save_image_path, save_image_name)
         cv.imwrite(save_image_full_path, new_frame)
         print(f"현재 화면이 {save_image_name}으로 저장되었습니다.")
+    # 'r' 키를 누르면 ROI 선택 모드로 전환
+    elif key == ord('r'):
+        print("ROI 선택 모드로 전환. 화면에서 드래그하여 ROI를 선택한 후 q키를 누르세요.")
+        original_copy = frame.copy()  # 원본 프레임 복사
+        roi_start = (0, 0)
+        roi_end = (0, 0)
+        drawing = True
 
-        # ======================================================
+    elif key == ord('q') and drawing:  # q를 누르면 ROI 선택 완료
+        roi_end = (int(roi_end[0] + roi_start[0]), int(roi_end[1] + roi_start[1]))
+        roi = tuple(map(int, (roi_start[0], roi_start[1], roi_end[0] - roi_start[0], roi_end[1] - roi_start[1])))
+        drawing = False
+        cv.rectangle(original_copy, (roi[0], roi[1]), (roi[0] + roi[2], roi[1] + roi[3]), (0, 255, 0), 2)
+        cv.imshow("Video Player : Team 4", original_copy)
+
+    # ======================================================
     while ((time.time() - s) * 1000) < (dly_ms - margin):  # dly_ms: ms로 표시한 프레임간의 간격[ms]
         pass
 
-        # ======================================================
+# 동영상 재생이 끝나면 종료
+videoCapture.release()
+out.release()
+cv.destroyAllWindows()
