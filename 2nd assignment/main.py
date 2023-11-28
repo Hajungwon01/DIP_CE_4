@@ -11,25 +11,8 @@ def position_callback(pos):
     videoCapture.set(cv.CAP_PROP_POS_FRAMES, pos)
 
 def callback_AlgSelect(x):
-    global frame_scaling
-    if x == 0:      # default
-        pass
-    elif x == 1:    # HE
-        frame_scaling = HE(frame_scaling)
-    elif x == 2:    # BF
-        pass
-    elif x == 3:    # UM
-        pass
+    pass
 
-
-
-# def BF_sigmaColor(x):
-#     global sigmaColor
-#     sigmaColor = x
-#
-# def sigma_callback(x):
-#     global sigmaSpace
-#     sigmaSpace = x
 # 시그마 트랙바 콜백 함수
 def callback_S(x):
     pass
@@ -71,6 +54,7 @@ def HE(img):
     equalized_img_bgr = cv.cvtColor(equalized_img, cv.COLOR_GRAY2BGR)
 
     return equalized_img_bgr
+
 
 # 파일 지정
 Path = "../data/"  # 파일 경로
@@ -159,13 +143,22 @@ while success:  # Loop until there are no more frames.
 
     frame_scaling = frame.copy()
 
+    x = cv.getTrackbarPos('Algorithm', 'Video Player : Team 4')
+
+    if x == 0:      # default
+        pass
+    elif x == 1:    # HE
+        frame_scaling = HE(frame_scaling)
+    elif x == 2:    # BF
+        frame_scaling = BF(frame_scaling)
+    elif x == 3:    # UM
+        frame_scaling = UM(frame_scaling / 255)
+
     # ======================================================
 
     # 현재 프레임 인덱스
     current_frame_index = int(videoCapture.get(cv.CAP_PROP_POS_FRAMES))
 
-    # frame_scaling = UM(frame_scaling / 255)
-    frame_scaling = BF(frame_scaling)
     # 현재 프레임 인덱스를 원본 영상과 처리된 영상의 좌측 상단에 빨간색으로 표시
     cv.putText(frame, f'org_index={current_frame_index}', (10, 15), cv.FONT_HERSHEY_PLAIN, 1, (0, 0, 255), 2)
     cv.putText(frame_scaling, f'this_index={current_frame_index}', (10, 15), cv.FONT_HERSHEY_PLAIN, 1, (0, 0, 255),
