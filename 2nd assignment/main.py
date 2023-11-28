@@ -36,10 +36,10 @@ def UM(img):
 
 
 def BF(img):
-    d = cv.getTrackbarPos('sigma', 'Video Player : Team 4') * 6 + 1
+    d = -1
     sigmaColor = cv.getTrackbarPos('sigmaColor',  # 트랙바 앞에 표시될 트랙바의 이름
                                    'Video Player : Team 4')
-    sigmaSpace = cv.getTrackbarPos('sigma', 'Video Player : Team 4')
+    sigmaSpace = 7
     dst = cv.bilateralFilter(img, d, sigmaColor, sigmaSpace)
     return dst
 
@@ -112,12 +112,12 @@ if not os.path.exists(save_image_path):
 # 트랙바 생성 및 콜백 함수 연결
 cv.createTrackbar('Position', 'Video Player : Team 4', 0, max_frame_index, position_callback)
 
-cv.createTrackbar('Algorithm', 'Video Player : Team 4', 0, 3, callback_AlgSelect)
+cv.createTrackbar('Algorithm', 'Video Player : Team 4', 2, 3, callback_AlgSelect)
 
 cv.createTrackbar('sigma',  # 트랙바 앞에 표시될 트랙바의 이름
                   'Video Player : Team 4',  # 트랙바가 나타날 창의 이름
                   1,  # 시작 당시의 슬라이더의 초기 위치
-                  8, callback_S)  # 슬라이더가 움직일 때 호출될 콜백 함수의 이름.
+                  15, callback_S)  # 슬라이더가 움직일 때 호출될 콜백 함수의 이름.
 # 첫 번째 파라미터:트랙 바 위치.두 번째 파라미터:사용자 데이터.
 # 3) scale
 cv.createTrackbar('scale',  # 트랙바 앞에 표시될 트랙바의 이름
@@ -127,8 +127,8 @@ cv.createTrackbar('scale',  # 트랙바 앞에 표시될 트랙바의 이름
 
 cv.createTrackbar('sigmaColor',  # 트랙바 앞에 표시될 트랙바의 이름
                   'Video Player : Team 4',  # 트랙바가 나타날 창의 이름
-                  1,  # 시작 당시의 슬라이더의 초기 위치
-                  15, BF_sigmaColor)  # 슬라이더가 움직일 때 호출될 콜백 함수의 이름.
+                  25,  # 시작 당시의 슬라이더의 초기 위치
+                  50, BF_sigmaColor)  # 슬라이더가 움직일 때 호출될 콜백 함수의 이름.
 
 success, frame = videoCapture.read()  # 동영상을 성공적으로 열었을 경우 프레임을 받아온다
 
@@ -153,6 +153,7 @@ while success:  # Loop until there are no more frames.
         frame_scaling = BF(frame_scaling)
     elif x == 3:    # UM
         frame_scaling = UM(frame_scaling / 255)
+        frame_scaling = np.clip(frame_scaling * 255, 0, 255).astype('uint8')
 
     # ======================================================
 
@@ -167,7 +168,6 @@ while success:  # Loop until there are no more frames.
     # ======================================================
 
     # 화면 분할 기능 : 원본 영상과 scaling된 영상을 x축(가로 방향)상으로 이어붙이기
-    # frame_scaling = np.clip(frame_scaling * 255, 0, 255).astype('uint8')
     new_frame = np.hstack((frame, frame_scaling))
 
     # 분할된 화면 출력하기
