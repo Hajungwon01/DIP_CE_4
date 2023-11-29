@@ -10,6 +10,20 @@ roi_start = (0, 0)
 roi_end = (0, 0)
 original_copy = None
 
+# 마우스 이벤트 콜백 함수
+def mouse_callback(event, x, y, flags, param):
+    global roi_start, roi_end, drawing, original_copy
+
+    if event == cv.EVENT_LBUTTONDOWN:
+        roi_start = (x, y)
+        drawing = True
+
+    elif event == cv.EVENT_LBUTTONUP:
+        roi_end = (x, y)
+        drawing = False
+        cv.rectangle(original_copy, roi_start, roi_end, (0, 255, 0), 2)
+        cv.imshow("Video Player : Team 4", original_copy)
+
 # position 트랙바 콜백 함수
 def position_callback(pos):
     videoCapture.set(cv.CAP_PROP_POS_FRAMES, pos)
@@ -99,6 +113,8 @@ cv.createTrackbar('sigma', 'Video Player : Team 4', 1, 8, callback_S)
 cv.createTrackbar('scale', 'Video Player : Team 4', 1, 6, callback_S1)
 cv.createTrackbar('sigmaColor', 'Video Player : Team 4', 1, 15, BF_sigmaColor)
 
+cv.setMouseCallback("Video Player : Team 4", mouse_callback)
+
 success, frame = videoCapture.read()  # 동영상을 성공적으로 열었을 경우 프레임을 받아온다
 
 current_frame_index = 0
@@ -184,7 +200,7 @@ while success:  # Loop until there are no more frames.
         roi_end = (int(roi_end[0] + roi_start[0]), int(roi_end[1] + roi_start[1]))
         roi = tuple(map(int, (roi_start[0], roi_start[1], roi_end[0] - roi_start[0], roi_end[1] - roi_start[1])))
         drawing = False
-        cv.rectangle(original_copy, (roi[0], roi[1]), (roi[0] + roi[2], roi[1] + roi[3]), (0, 255, 0), 2)
+        cv.rectangle(original_copy, roi_start, roi_end, (0, 255, 0), 2)
         cv.imshow("Video Player : Team 4", original_copy)
 
     # ======================================================
