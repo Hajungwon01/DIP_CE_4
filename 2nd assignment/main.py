@@ -109,7 +109,7 @@ if not os.path.exists(save_image_path):
 # 트랙바 생성 및 콜백 함수 연결
 cv.createTrackbar('Position', 'Video Player : Team 4', 0, max_frame_index, position_callback)
 
-cv.createTrackbar('Algorithm', 'Video Player : Team 4', 2, 3, callback_AlgSelect)
+cv.createTrackbar('Algorithm', 'Video Player : Team 4', 0, 3, callback_AlgSelect)
 
 cv.createTrackbar('sigma',  # 트랙바 앞에 표시될 트랙바의 이름
                   'Video Player : Team 4',  # 트랙바가 나타날 창의 이름
