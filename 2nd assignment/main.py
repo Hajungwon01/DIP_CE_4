@@ -44,16 +44,13 @@ def BF(img):
     return dst
 
 def HE(img):
-    # 그래이스케일 이미지로 변환
-    gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+    # 각각의 BGR 채널에 대해 HE를 실행
+    equalized_channels = [cv.equalizeHist(channel) for channel in cv.split(img)]
 
-    # HistogramEqualization
-    equalized_img = cv.equalizeHist(gray_img)
+    # HE를 실행한 채널들을 결합
+    equalized_img = cv.merge(equalized_channels)
 
-    # BGR로 재 전환
-    equalized_img_bgr = cv.cvtColor(equalized_img, cv.COLOR_GRAY2BGR)
-
-    return equalized_img_bgr
+    return equalized_img
 
 
 # 파일 지정
