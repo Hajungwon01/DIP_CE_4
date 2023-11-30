@@ -270,7 +270,7 @@ while success:  # Loop until there are no more frames.
             if key2 != -1:  # 아무 키나 누르면 동영상 일시 정지 해제
                 is_paused = False
     elif key == ord('s'):   # 's' 키를 누르면 현재 화면을 이미지로 저장
-        save_image_name = f'frame_{current_frame_index}.jpg'
+        save_image_name = f'team4_{current_frame_index}.jpg'
         save_image_full_path = os.path.join(save_image_path, save_image_name)
         cv.imwrite(save_image_full_path, new_frame)
         print(f"현재 화면이 {save_image_name}으로 저장되었습니다.")
@@ -529,7 +529,7 @@ while success:  # Loop until there are no more frames.
             if key2 == ord(' '):  # 스페이스바를 다시 누르면 동영상 일시 정지 해제
                 is_paused = False
     elif key == ord('s'): # 's' 키를 누르면 현재 화면을 이미지로 저장
-        save_image_name = f'frame_{current_frame_index}.jpg'
+        save_image_name = f'team4_{current_frame_index}.jpg'
         save_image_full_path = os.path.join(save_image_path, save_image_name)
         cv.imwrite(save_image_full_path, new_frame)
         print(f"현재 화면이 {save_image_name}으로 저장되었습니다.")
