@@ -199,18 +199,16 @@ while success:  # Loop until there are no more frames.
         cv.imwrite(save_image_full_path, new_frame)
         print(f"현재 화면이 {save_image_name}으로 저장되었습니다.")
 
-    # 'r' 키를 누르면 ROI 선택 모드로 전환
+        # 'r' 키를 누르면 ROI 선택 모드로 전환
     elif key == ord('r'):
         print("ROI 선택 모드로 전환. 화면에서 드래그하여 ROI를 선택하세요.")
-        roi = cv.selectROI("Video Player : Team 4", frame_scaling, fromCenter=False, showCrosshair=True)
+        roi = cv.selectROI("Video Player : Team 4", frame_scaling, showCrosshair=False)
+
+        # Enter 키를 누르면 ROI 선택 완료
+    elif key == 13:  # Enter 키의 ASCII 코드는 13
+        print("ROI 선택이 완료되었습니다.")
         cv.destroyAllWindows()
 
-        while True:
-            key3 = cv.waitKey(1)
-            if key3 == ord('q'):  # q 키를 누르면 ROI 선택 모드 종료
-                print("ROI 선택 모드 종료.")
-                roi = None
-                break
         # ======================================================
     while ((time.time() - s) * 1000) < (dly_ms - margin):  # dly_ms: ms로 표시한 프레임간의 간격[ms]
         pass
